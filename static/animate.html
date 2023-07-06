@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    /* Styling for the select dropdown */
+    .custom-select {
+      position: relative;
+      display: inline-block;
+      width: 200px;
+      height: 40px;
+      background-color: #f1f1f1;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    /* Styling for the select dropdown arrow */
+    .custom-select::after {
+      content: "";
+      position: absolute;
+      top: 16px;
+      right: 10px;
+      width: 0;
+      height: 0;
+      border: 6px solid transparent;
+      border-color: #000 transparent transparent transparent;
+    }
+
+    /* Styling for the select dropdown options */
+    .custom-select select {
+      width: 100%;
+      height: 100%;
+      padding: 10px;
+      background-color: transparent;
+      border: none;
+      outline: none;
+      appearance: none;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      cursor: pointer;
+    }
+
+    /* Styling for the divs */
+    .dropdown-content div {
+      display: none;
+      padding: 20px;
+      background-color: #f9f9f9;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      margin-top: 10px;
+    }
+
+    /* Animation for fading in the div */
+    .fade-in {
+      animation: fadeIn 0.5s ease-in-out;
+    }
+
+    /* Keyframes for the fade-in animation */
+    @keyframes fadeIn {
+      0% { opacity: 0; }
+      100% { opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+  <div class="custom-select">
+    <select onchange="showDiv(this)">
+      <option value="">Select an option</option>
+      <option value="div1">Option 1</option>
+      <option value="div2">Option 2</option>
+      <option value="div3">Option 3</option>
+    </select>
+  </div>
+
+  <div class="dropdown-content">
+    <div id="div1">Content for Option 1</div>
+    <div id="div2">Content for Option 2</div>
+    <div id="div3">Content for Option 3</div>
+  </div>
+
+  <script>
+    function showDiv(selectElement) {
+      var selectedOption = selectElement.value;
+      var divs = document.getElementsByClassName("dropdown-content")[0].getElementsByTagName("div");
+      
+      // Hide all divs initially
+      for (var i = 0; i < divs.length; i++) {
+        divs[i].style.display = "none";
+      }
+      
+      // Show the corresponding div for the selected option
+      if (selectedOption !== "") {
+        var selectedDiv = document.getElementById(selectedOption);
+        selectedDiv.style.display = "block";
+        selectedDiv.classList.add("fade-in");
+      }
+    }
+  </script>
+</body>
+</html>

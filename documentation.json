@@ -1,0 +1,1490 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Crypto Analyzer",
+    "description": "This API helps to provide some insightful endpoints for analyzing cryptocurrency. Users have the option of retrieving cryptocurrency prices on different exchange platforms, getting the best selling or buying prices for a particular asset pair, and more. The retrieved data can be downloaded in Excel format for further analysis.",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8030/api/v1",
+      "description": "Local Proto Testnet server"
+    }
+  ],
+
+  "components": {
+    "schemas": {
+
+      "ExchangeData": {
+        "type": "object",
+        "properties": {
+          "price": {
+            "type": "number"
+          },
+          "exchange": {
+            "type": "string"
+          },
+          "pair": {
+            "type": "string"
+          },
+          "pairPrice": {
+            "type": "number"
+          },
+          "volume": {
+            "type": "number"
+          }
+        }
+      },
+
+      "CoinData": {
+        "type": "object",
+        "properties": {
+          "rank": {
+            "type": "number"
+          },
+          "id": {
+            "type": "number"
+          },
+          "coin": {
+            "type": "string"
+          },
+          "presentPrice": {
+            "type": "number"
+          },
+          "oneHourPrice": {
+            "type": "number"
+          },
+          "oneDayPrice": {
+            "type": "number"
+          },
+          "oneWeekPrice": {
+            "type": "number"
+          },
+          "priceChange1h": {
+            "type": "number"
+          },
+          "priceChange1d": {
+            "type": "number"
+          },
+           "priceChange1w": {
+            "type": "number"
+          },
+          "volumeTraded": {
+            "type": "number"
+          },
+          "contractAddress": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          }
+        }
+      },
+
+      "CoinSymbolicId": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "symbol": {
+            "type": "string"
+          }
+        }
+      },
+
+      "HistoricalPriceResponse": {
+        "type": "array",
+        "items": {
+          "oneOf": [
+            {
+              "$ref": "#/components/schemas/PriceWithTrend"
+            },
+            {
+              "$ref": "#/components/schemas/PriceWithoutTrend"
+            }
+          ]
+        }
+      },
+
+      "PriceWithoutTrend": {
+        "type": "object",
+        "properties": {
+          "date": {
+            "type": "string"
+          },
+          "time": {
+            "type": "string"
+          },
+          "price": {
+            "type": "number"
+          }
+        }
+      },
+
+      "PriceWithTrend": {
+        "type": "object",
+        "properties": {
+          "date": {
+            "type": "string"
+          },
+          "time": {
+            "type": "string"
+          },
+          "price": {
+            "type": "number"
+          },
+          "priceChange": {
+            "type": "number"
+          },
+          "changeDirection": {
+            "type": "string"
+          }
+        }
+      }
+
+    }
+  },
+  
+  "paths": {
+
+    "/coins": {
+      "get": {
+        "summary": "Retrieve current coin Data",
+        "description": "This get current live coin  data. Data retrieved provides insightful details about the coin price, rank, it price change within the time period as well as it contract address if any available for the crypto coin.",
+        "parameters": [
+            {
+              "name": "skip",
+              "in": "query",
+              "description": "numbers of coin to skip retrieving",
+              "required": false,
+              "default": 0,
+              "schema": {
+                "type": "number"
+              }
+            },
+            
+            {
+              "name": "limit",
+              "in": "query",
+              "description": "The maximum number of coin to retrieved",
+              "required": false,
+              "default": 20,
+              "schema": {
+                "type": "number"
+              }
+            }
+        ],
+
+        "responses": {
+
+          "200": {
+            "description": "Successful response",
+            "content": {
+               "application/json": {
+                  "schema": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/CoinData"
+                    }
+                  },
+                  "example": [
+                    {
+                      "rank": 1,
+                      "id" : "bitcoin",
+                      "coin": "Bitcoin",
+                      "presentPrice":45908,
+                      "oneHourPrice" : 0.4,
+                      "oneDayPrice" : 0.23,
+                      "oneWeekPrice" : 0.39,
+                      "priceChange1h": 40342,
+                      "priceChange1d":43590,
+                      "priceChange1w":41023,
+                      "volumeTraded":19405859,
+                      "contractAddress": "X04584958fj59fjfj958",
+                      "url": "www.blockinchain.bitly.net"
+                    }
+                  ]
+                }
+            }
+
+          },
+
+          "408": {
+            "description": "Connectivity Problem",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Check your interconnectivity to the server"
+                }
+              }
+            }
+          },
+
+          "406": {
+            "description": "Bad Query Format passed in",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "skip and limit if used must be a valid number"
+                }
+              }
+            }
+          },
+
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Internal server error occurred"
+                }
+              }
+            }
+          }
+
+        }
+      }
+    },
+
+    "/coins/symbols": {
+      "get": {
+        "summary": "Simplified coin name, id, symbol for further querying",
+        "description": "This endpoint allows users to see the name, id and symbol of up to 200 coin. Knowing the right id,symbol to pass in to some of the various end point is necessary so as to get the right relevant response",
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CoinSymbolicId"
+                  }
+                },
+                "example": [
+                  {
+                    "id": "bitcoin",
+                    "name": "Bitcoin",
+                    "symbol": "BTC"
+                  },
+                  {
+                    "id": "ethereum",
+                    "name": "Ethereum",
+                    "symbol": "ETH"
+                  },
+                  {
+                    "id": "tether",
+                    "name": "Tether",
+                    "symbol": "USDT"
+                  },
+                  {
+                    "id": "binance-coin",
+                    "name": "BNB",
+                    "symbol": "BNB"
+                  }
+                ]
+              }
+            }
+          },
+          "500":{
+            "description":"Internal Problem"
+          }
+        }
+      }
+    },
+
+    "/coins/download": {
+      "get": {
+        "summary": "Download market coin pair price as Excel",
+        "description": "This get the coin and allow the user download a detailed coin data summary as an Excel file. It requires all the parameters to be passed. If successful, the response will be an Excel file that can be downloaded.",
+        "parameters": [
+          {
+            "name": "skip",
+            "in": "query",
+            "description": "numbers of coin to skip retrieving",
+            "required": false,
+            "default": 0,
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "The maximum number of coin to retrieved",
+            "required": false,
+            "default": 20,
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+
+          "408": {
+            "description": "Connectivity Problem",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Check your interconnectivity to the server"
+                }
+              }
+            }
+          },
+
+          "406": {
+            "description": "Bad Query Format passed in",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "skip and limit if used must be a valid number"
+                }
+              }
+            }
+          },
+
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Internal server error occurred"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+
+    "/markets": {
+      "get": {
+        "summary": "Retrieves the paired price of a coin from all available exchange market",
+        "description": "This endpoint takes in a query of coinId. All available pair with the paired price on all exchange will be retrieved if successfull",
+        "parameters": [
+          {
+            "name": "coinId",
+            "in": "query",
+            "description": "The ID of the coin",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example":"bitcoin"
+          }
+        ],
+
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ExchangeData"
+                  }
+                },
+                "example": [
+                  {
+                    "price": 1853.84,
+                    "exchange": "Binance",
+                    "pair": "ETH/USDT",
+                    "pairPrice": 1853.84,
+                    "volume": 60547.19486664
+                  },
+                  {
+                    "price": 1850.6588099999997,
+                    "exchange": "Luno",
+                    "pair": "ETH/USDC",
+                    "pairPrice": 1.001,
+                    "volume": 33404.9837313192
+                  }
+                ]
+              }
+            }
+          },
+          "408": {
+            "description": "Connectivity Problem",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Check your internet Connection"
+                }
+              }
+            }
+          },
+
+          "406": {
+            "description": "Not Acceptable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Query Parameter of .... not specified"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Internal server error occurred"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+
+    "/markets/download": {
+      "get": {
+        "summary": "Download market coin pair price as Excel",
+        "description": "This endpoint retrieves the market coin pair price and allows the user to download it as an Excel file. It requires all the parameters to be passed. If successful, the response will be an Excel file that will be downloaded.",
+        "parameters": [
+          {
+            "name": "coinId",
+            "in": "query",
+            "description": "The ID of the coin",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example":"bitcoin"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Error occurred"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Internal server error occurred"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+
+    "/markets/byPair": {
+      "get": {
+        "summary": "Retrieves the pair trading prices of a coin from the exchange market",
+        "description": "This endpoint takes in a query of : 'coinId','fromId' and toId. The fromId should be the symbol of the coinId passed in the query, while the toId is the symbol of any other valid coin you aim to retrieve the pair trading of the asset. This should get the coin paired to an asset",
+        "parameters": [
+          {
+            "name": "coinId",
+            "in": "query",
+            "description": "The ID of the coin",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example":"bitcoin"
+          },
+          {
+            "name": "fromId",
+            "in": "query",
+            "description": "The coin symbol equivalent to the id of the coin",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example":"btc"
+          },
+          {
+            "name": "toId",
+            "in": "query",
+            "description": "This should be the symbol of any coin you want to pair together with the coinId ",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example":"eth"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ExchangeData"
+                  }
+                },
+                "example": [
+                  {
+                    "price": 1853.84,
+                    "exchange": "Binance",
+                    "pair": "ETH/USDC",
+                    "pairPrice": 1853.84,
+                    "volume": 60547.19486664
+                  },
+                  {
+                    "price": 1850.6588099999997,
+                    "exchange": "Binance",
+                    "pair": "ETH/USDC",
+                    "pairPrice": 1.001,
+                    "volume": 33404.9837313192
+                  }
+                ]
+              }
+            }
+          },
+          "406": {
+            "description": "Not Acceptable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Query Parameter of .... not specified"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Internal server error occurred"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+
+    "/markets/fromExchange": {
+      "get": {
+        "summary": "Retrieve buying and trading prices of a coin from a specific exchange",
+        "description": "This endpoint takes in a query parameter 'coinId' and 'platform' to specify the exchange platform the user is trying to get the buying and trading prices of a particular coin.",
+        "parameters": [
+          {
+            "name": "coinId",
+            "in": "query",
+            "description": "The ID of the coin",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example":"ethereum"
+          },
+          {
+            "name": "platform",
+            "in": "query",
+            "description": "The exchange platform",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example":"binance"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ExchangeData"
+                  }
+                },
+                "example": [
+                  {
+                    "price": 1853.84,
+                    "exchange": "ABCC",
+                    "pair": "ETH/USDT",
+                    "pairPrice": 1853.84,
+                    "volume": 60547.19486664
+                  },
+                  {
+                    "price": 1850.6588099999997,
+                    "exchange": "ABCC",
+                    "pair": "ETH/USDC",
+                    "pairPrice": 1.001,
+                    "volume": 33404.9837313192
+                  }
+                ]
+              }
+            }
+          },
+          "406": {
+            "description": "Not Accepted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Query Param not adhered to"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Internal server error occurred"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+
+    "/exchange": {
+      "get": {
+        "summary": "This endpoint retrieves the list of exchange platform available in the crypto exchange mmarket.",
+        "description": "A list of exchange platform available will be retrieved on successfull response. Knowing the relevant exchange name is of high importance as some endpoint requires passing the name of the exchange platform as a payload alongside the request",
+        "parameters": [
+          {
+            "name": "static",
+            "in": "query",
+            "description": "This is an optional query to be passed alongside the request. value to be passed in can be true or false. value is true by default, this enable us to retrieve the cached data which will enable a faster response",
+            "required": false,
+            "default":false,
+            "schema": {
+              "type": "boolean"
+            },
+            "example":true
+          }
+          
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "example": [
+                  "Binance",
+                  "Bitbank",
+                  "CoinMate",
+                  "CoinSpot",
+                  "CoinTiger",
+                  "Coinbase",
+                  "Coincheck",
+                  "Coingi",
+                  "Coinone",
+                  "Coinsbit"
+                ]
+              }
+            }
+          },
+          "500":{
+            "description":"Internal Problem"
+          }
+        }
+      }
+    },
+
+    "/exchange/maxPrice": {
+      "get": {
+        "summary": "Retrieves an exchange platform trading at a particular paired asset at highest pair",
+        "description": "This retrieves the exchange platform that trades a particular asset at the highest price. Ensure search query of coinId, fromId, toId are passed alongside the url. This end point if successfull will return a single object containing the exchange platform, price, pairPrice, volume and the pair",
+        "parameters": [
+          {
+            "name": "coinId",
+            "in": "query",
+            "description": "The ID of the coin",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example":"ethereum"
+          },
+          {
+            "name": "fromId",
+            "in": "query",
+            "description": "symbol of the coin id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example":"eth"
+          },
+          {
+            "name": "toId",
+            "in": "query",
+            "description": "symbol of the any valid coin id you are interested in pairing the coin to retrieve with",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example":"BTC"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "$ref": "#/components/schemas/ExchangeData"
+                },
+                "example":{
+                  "price": 1853.84,
+                  "exchange": "ABCC",
+                  "pair": "ETH/BTC",
+                  "pairPrice": 1853.84,
+                  "volume": 60547.19486664
+                }
+              }
+            }
+          },
+          "406": {
+            "description": "Not Accepted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Query Param not adhered to"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Internal server error occurred"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+
+    "/exchange/minPrice": {
+      "get": {
+        "summary": "Retrieves an exchange platform trading at a particular paired asset at lowest pair",
+        "description": "This retrieves the exchange platform that trades a particular asset at the lowest price. Ensure search query of coinId, fromId, toId are passed alongside the url. This end point if successfull will return a single object containing the exchange platform, price, pairPrice, volume and the pair",
+        "parameters": [
+          {
+            "name": "coinId",
+            "in": "query",
+            "description": "The ID of the coin",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example":"ethereum"
+          },
+          {
+            "name": "fromId",
+            "in": "query",
+            "description": "symbol of the coin id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example":"eth"
+          },
+          {
+            "name": "toId",
+            "in": "query",
+            "description": "symbol of the any valid coin id you are interested in pairing the coin to retrieve with",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example":"BTC"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "$ref": "#/components/schemas/ExchangeData"
+                },
+                "example":{
+                  "price": 1853.84,
+                  "exchange": "ABCC",
+                  "pair": "ETH/BTC",
+                  "pairPrice": 1853.84,
+                  "volume": 60547.19486664
+                }
+              }
+            }
+          },
+          "406": {
+            "description": "Not Accepted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Query Param not adhered to"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Internal server error occurred"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+
+    "/exchange/maxVolume": {
+      "get": {
+        "summary": "Retrieves an exchange platform that have traded the largest volume of a paired asset within the interval",
+        "description": "This retrieves the exchange platform trading an asset at a high volume rate. These queries are required coinId, fromId, toId are passed alongside the url",
+        "parameters": [
+          {
+            "name": "coinId",
+            "in": "query",
+            "description": "The ID of the coin",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example":"ethereum"
+          },
+          {
+            "name": "fromId",
+            "in": "query",
+            "description": "symbol of the coin id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example":"eth"
+          },
+          {
+            "name": "toId",
+            "in": "query",
+            "description": "symbol of the any valid coin id you are interested in pairing the coin to retrieve with",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example":"BTC"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "$ref": "#/components/schemas/ExchangeData"
+                },
+                "example":{
+                  "price": 1853.84,
+                  "exchange": "ABCC",
+                  "pair": "ETH/BTC",
+                  "pairPrice": 1853.84,
+                  "volume": 60547.19486664
+                }
+              }
+            }
+          },
+          "406": {
+            "description": "Not Accepted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Query Param not adhered to"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Internal server error occurred"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+
+    "/exchange/minVolume": {
+      "get": {
+        "summary": "Retrieves an exchange platform that have traded the lowest volume of a paired asset within the interval",
+        "description": "This retrieves the exchange platform trading an asset at a low volume rate. These queries are required coinId, fromId, toId are passed alongside the url",
+        "parameters": [
+          {
+            "name": "coinId",
+            "in": "query",
+            "description": "The ID of the coin",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example":"ethereum"
+          },
+          {
+            "name": "fromId",
+            "in": "query",
+            "description": "symbol of the coin id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example":"eth"
+          },
+          {
+            "name": "toId",
+            "in": "query",
+            "description": "symbol of the any valid coin id you are interested in pairing the coin to retrieve with",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example":"BTC"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "$ref": "#/components/schemas/ExchangeData"
+                },
+                "example":{
+                  "price": 1853.84,
+                  "exchange": "ABCC",
+                  "pair": "ETH/BTC",
+                  "pairPrice": 1853.84,
+                  "volume": 60547.19486664
+                }
+              }
+            }
+          },
+          "406": {
+            "description": "Not Accepted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Query Param not adhered to"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Internal server error occurred"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+
+    "/historicalprice": {
+
+      "get": {
+        "summary": "Retrieves an historical price data of the specified coin",
+        "description": "This retrieves an analyzed historical price trend of a cryptocurrency coin. This endpoint takes in period, coinId as query and an optional query of includeTrend true or false. add the trend shows if the coin is has followed a declined trend or incremental trend in respect to the preceeding price",
+        "parameters": [
+          {
+            "name": "coinId",
+            "in": "query",
+            "description": "The ID of the coin",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example":"ethereum"
+          },
+          {
+            "name": "period",
+            "in": "query",
+            "description": "The timeframe of the coin price to retrieve such as retrieving the 1 week, 24 hours price trend etc",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum":["24h","1w","1m","3m","6m","1y","all"]
+            },
+            "default":"24h"
+          },
+          {
+            "name": "includeTrend",
+            "in": "query",
+            "description": "This when set to true adds and more in depth analysis to the retrieved data including the price Change and the change direction to the retrieved data ",
+            "schema": {
+              "type": "boolean"
+            },
+            "default":false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {   
+                  "$ref": "#/components/schemas/HistoricalPriceResponse"   
+                },
+                "examples":{
+                  "PriceWithTrend": {
+                    "summary": "Response with trend data",
+                    "value": [
+                      {
+                        "date": "6/21/2023",
+                        "time": "3:48:00 PM",
+                        "price": 1877.7566,
+                        "priceChange": 0,
+                        "changeDirection": "Unchanged"
+                      },
+                      {
+                        "date": "6/21/2023",
+                        "time": "3:48:00 PM",
+                        "price": 1800.7566,
+                        "priceChange": -77,
+                        "changeDirection": "Decrease"
+                      },
+                      {
+                        "date": "6/21/2023",
+                        "time": "4:48:00 PM",
+                        "price": 1881.3298,
+                        "priceChange": 3.5732000000000426,
+                        "changeDirection": "Increase"
+                      }
+                    ]
+                  },
+                  "PriceWithoutTrend": {
+                    "summary": "Response with out trend data",
+                    "value": [
+                      {
+                        "date": "6/21/2023",
+                        "time": "3:48:00 PM",
+                        "price": 1877.7566
+                      },
+                      {
+                        "date": "6/21/2023",
+                        "time": "4:48:00 PM",
+                        "price": 1881.3298
+                      }
+                    ]
+                  }  
+                }
+              }
+            }
+          },
+          "406": {
+            "description": "Not Accepted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Query Param not adhered to"
+                }
+              }
+            }
+          },
+
+          "408": {
+            "description": "Connectivity Problem",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Check your interconnectivity to the server"
+                }
+              }
+            }
+          },
+
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Internal server error occurred"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+
+    "/historicalprice/download": {
+      "get": {
+        "summary": "Download  historical price data of the specified coin as Excel",
+        "description": "This endpoint allows the user to donwload an analyzed historical price trend of a cryptocurrency coin. This endpoint takes in period, coinId as query and an optional query of includeTrend true or false. add the trend shows if the coin is has followed a declined trend or incremental trend in respect to the preceeding price",
+        "parameters": [
+          {
+            "name": "coinId",
+            "in": "query",
+            "description": "The ID of the coin",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example":"ethereum"
+          },
+          {
+            "name": "period",
+            "in": "query",
+            "description": "The timeframe of the coin price to retrieve such as retrieving the 1 week, 24 hours price trend etc",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum":["24h","1w","1m","3m","6m","1y","all"]
+            },
+            "default":"24h"
+          },
+          {
+            "name": "includeTrend",
+            "in": "query",
+            "description": "This when set to true adds and more in depth analysis to the retrieved data including the price Change and the change direction to the retrieved data ",
+            "schema": {
+              "type": "boolean"
+            },
+            "default":false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+
+          "406": {
+            "description": "Not Accepted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Query Param not adhered to"
+                }
+              }
+            }
+          },
+
+          "408": {
+            "description": "Connectivity Problem",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Check your interconnectivity to the server"
+                }
+              }
+            }
+          },
+
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Internal server error occurred"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
