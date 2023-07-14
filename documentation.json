@@ -8,11 +8,11 @@
   "servers": [
     {
       "url": "http://localhost:8030/api/v1",
-      "description": "Local Proto Testnet server",
+      "description": "Local Proto Testnet server"
     },
     {
       "url": "https://jodev-crypt-api.onrender.com/api/v1",
-      "description": "Live server on Render.com platform",
+      "description": "Live server on Render.com platform"
     }
   ],
 
