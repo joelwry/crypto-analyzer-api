@@ -8,11 +8,7 @@
   "servers": [
     {
       "url": "http://localhost:8030/api/v1",
-      "description": "Local Proto Testnet server"
-    },
-    {
-      "url": "https://jodev-crypt-api.onrender.com/api/v1",
-      "description": "Live server on Render.com platform"
+      "description": "Proto Testnet server"
     }
   ],
 
@@ -626,12 +622,12 @@
           {
             "name": "toId",
             "in": "query",
-            "description": "This should be the symbol of any coin you want to pair together with the coinId ",
+            "description": "This should be the symbol of any currency such as gbp,ngn,eur,usd, inr, aud etc. A list of currency code can be seen at https://www.iban.com/currency-codes",
             "required": true,
             "schema": {
               "type": "string"
             },
-            "example":"eth"
+            "example":"usd"
           }
         ],
         "responses": {
@@ -879,12 +875,12 @@
           {
             "name": "toId",
             "in": "query",
-            "description": "symbol of the any valid coin id you are interested in pairing the coin to retrieve with",
+            "description": "symbol of the any valid coin id e.g btc,xrp or currency short codes such as inr,usd,aud,ngn etc that you are interested in pairing the coin to retrieve with",
             "required": true,
             "schema": {
               "type": "string"
             },
-            "example":"BTC"
+            "example":"btc"
           }
         ],
         "responses": {
@@ -974,12 +970,12 @@
           {
             "name": "toId",
             "in": "query",
-            "description": "symbol of the any valid coin id you are interested in pairing the coin to retrieve with",
+            "description": "symbol of the any valid coin id e.g btc,xrp or currency short codes such as inr,usd,aud,ngn etc that you are interested in pairing the coin to retrieve with",
             "required": true,
             "schema": {
               "type": "string"
             },
-            "example":"BTC"
+            "example":"usd"
           }
         ],
         "responses": {
@@ -1069,12 +1065,12 @@
           {
             "name": "toId",
             "in": "query",
-            "description": "symbol of the any valid coin id you are interested in pairing the coin to retrieve with",
+            "description": "symbol of the any valid coin id e.g btc,xrp or currency short codes such as inr,usd,aud,ngn etc that you are interested in pairing the coin to retrieve with",
             "required": true,
             "schema": {
               "type": "string"
             },
-            "example":"BTC"
+            "example":"btc"
           }
         ],
         "responses": {
@@ -1164,7 +1160,7 @@
           {
             "name": "toId",
             "in": "query",
-            "description": "symbol of the any valid coin id you are interested in pairing the coin to retrieve with",
+            "description": "symbol of the any valid coin id e.g btc,xrp or currency short codes such as inr,usd,aud,ngn etc that you are interested in pairing the coin to retrieve with",
             "required": true,
             "schema": {
               "type": "string"
